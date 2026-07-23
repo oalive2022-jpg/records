@@ -1,0 +1,23 @@
+{
+  "name": "meal-lodging-report",
+  "version": "1.0.0",
+  "description": "食事・宿泊報告ツール（ホーム単位管理・本部管理者ダッシュボード付き）",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node scripts/seed_homes.js",
+    "migrate": "node scripts/migrate.js"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-pg-simple": "^9.0.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "pg": "^8.12.0"
+  }
+}
