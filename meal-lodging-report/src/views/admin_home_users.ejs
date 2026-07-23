@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= home.name %>の利用者管理｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">利用者管理 - <%= home.name %></span>
+    <nav>
+      <a href="/admin/homes/manage">ホーム管理へ戻る</a>
+      <a href="/admin/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>利用者を新規追加</h1>
+      <p class="muted">ここで登録した利用者が、「<%= home.name %>」の職員がログインしたときの報告フォームにタブとして表示されます。</p>
+      <form method="POST" action="/admin/homes/<%= home.id %>/users">
+        <label for="name">利用者名</label>
+        <input type="text" name="name" id="name" required placeholder="例: 山田太郎" />
+        <button type="submit">追加する</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>登録済み利用者一覧</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>利用者名</th>
+            <th>状態</th>
+            <th>有効/無効</th>
+            <th>削除</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(function(u) { %>
+            <tr>
+              <td><%= u.name %></td>
+              <td>
+                <span class="<%= u.active ? 'mark-ok' : 'mark-ng' %>"><%= u.active ? '有効' : '無効' %></span>
+              </td>
+              <td>
+                <form class="inline" method="POST" action="/admin/homes/<%= home.id %>/users/<%= u.id %>/toggle">
+                  <button type="submit" style="margin-top:0;"><%= u.active ? '無効にする' : '有効にする' %></button>
+                </form>
+              </td>
+              <td>
+                <form class="inline" method="POST" action="/admin/homes/<%= home.id %>/users/<%= u.id %>/delete" onsubmit="return confirm('「<%= u.name %>」を削除しますか？過去の報告記録は残ります。');">
+                  <button type="submit" class="danger" style="margin-top:0;">削除</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (users.length === 0) { %>
+            <tr><td colspan="4" class="muted">まだ利用者が登録されていません</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+      <p class="muted">「無効にする」を使うと、削除せずに一時的に報告フォームのタブから外すことができます（退所予定の方などに）。</p>
+    </div>
+  </div>
+</body>
+</html>
