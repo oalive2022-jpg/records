@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= home.name %>の利用者管理｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">利用者管理 - <%= home.name %></span>
+    <nav>
+      <a href="/admin/homes/manage">ホーム管理へ戻る</a>
+      <a href="/admin/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>利用者を新規追加</h1>
+      <p class="muted">朝食・夕食の単価は、月次Excel出力の食費集計に使われます（宿泊費は計算対象外です）。後から変更もできます。</p>
+      <form method="POST" action="/admin/homes/<%= home.id %>/users">
+        <label for="name">利用者名</label>
+        <input type="text" name="name" id="name" required placeholder="例: 山田太郎" />
+
+        <div class="filter-bar">
+          <div>
+            <label for="breakfast_price">朝食単価（円）</label>
+            <input type="number" name="breakfast_price" id="breakfast_price" min="0" step="1" value="0" />
+          </div>
+          <div>
+            <label for="dinner_price">夕食単価（円）</label>
+            <input type="number" name="dinner_price" id="dinner_price" min="0" step="1" value="0" />
+          </div>
+        </div>
+
+        <button type="submit">追加する</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>登録済み利用者一覧</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>利用者名</th>
+            <th>朝食単価</th>
+            <th>夕食単価</th>
+            <th>状態</th>
+            <th>有効/無効</th>
+            <th>削除</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(function(u) { %>
+            <tr>
+              <td>
+                <form class="inline" method="POST" action="/admin/homes/<%= home.id %>/users/<%= u.id %>/update" style="display:flex; gap:6px; align-items:center; justify-content:center;">
+                  <input type="text" name="name" value="<%= u.name %>" required style="width:110px;" />
+              </td>
+              <td>
+                  <input type="number" name="breakfast_price" min="0" step="1" value="<%= Number(u.breakfast_price) %>" style="width:80px;" />
+              </td>
+              <td>
+                  <input type="number" name="dinner_price" min="0" step="1" value="<%= Number(u.dinner_price) %>" style="width:80px;" />
+                  <button type="submit" style="margin-top:0;">更新</button>
+                </form>
+              </td>
+              <td>
+                <span class="<%= u.active ? 'mark-ok' : 'mark-ng' %>"><%= u.active ? '有効' : '無効' %></span>
+              </td>
+              <td>
+                <form class="inline" method="POST" action="/admin/homes/<%= home.id %>/users/<%= u.id %>/toggle">
+                  <button type="submit" style="margin-top:0;"><%= u.active ? '無効にする' : '有効にする' %></button>
+                </form>
+              </td>
+              <td>
+                <form class="inline" method="POST" action="/admin/homes/<%= home.id %>/users/<%= u.id %>/delete" onsubmit="return confirm('「<%= u.name %>」を削除しますか？過去の報告記録は残ります。');">
+                  <button type="submit" class="danger" style="margin-top:0;">削除</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (users.length === 0) { %>
+            <tr><td colspan="6" class="muted">まだ利用者が登録されていません</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+      <p class="muted">「無効にする」を使うと、削除せずに一時的に報告フォームのタブから外すことができます（退所予定の方などに）。単価を変更して「更新」を押すと、名前・朝食単価・夕食単価をまとめて反映できます。</p>
+    </div>
+  </div>
+</body>
+</html>
