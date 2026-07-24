@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理者ログイン｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">食事宿泊報告ツール（本部管理者）</span>
+    <nav><a href="/login">ホーム職員はこちら</a></nav>
+  </header>
+
+  <div class="container">
+    <div class="card" style="max-width:420px; margin:0 auto;">
+      <h1>本部管理者ログイン</h1>
+
+      <% if (error) { %>
+        <p class="error"><%= error %></p>
+      <% } %>
+
+      <form method="POST" action="/admin/login">
+        <label for="password">パスワード</label>
+        <input type="password" name="password" id="password" required autofocus />
+        <button type="submit">ログイン</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
