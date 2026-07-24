@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理者ダッシュボード｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">本部管理者ダッシュボード</span>
+    <nav>
+      <a href="/admin/homes/manage">ホーム管理</a>
+      <a href="/admin/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>Excel出力</h1>
+      <div class="filter-bar">
+        <form method="GET" action="/admin/export/daily" style="display:flex; gap:8px; align-items:flex-end;">
+          <div>
+            <label for="export_date">指定した日だけ出力</label>
+            <input type="date" name="date" id="export_date" required />
+          </div>
+          <div><button type="submit">Excelダウンロード</button></div>
+        </form>
+
+        <form method="GET" action="/admin/export/monthly" style="display:flex; gap:8px; align-items:flex-end;">
+          <div>
+            <label for="export_month">指定した月だけ出力</label>
+            <input type="month" name="month" id="export_month" required />
+          </div>
+          <div><button type="submit">Excelダウンロード</button></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <h1>全ホーム 報告一覧</h1>
+
+      <form method="GET" action="/admin" class="filter-bar">
+        <div>
+          <label for="home_id">ホーム</label>
+          <select name="home_id" id="home_id">
+            <option value="">すべて</option>
+            <% homes.forEach(function(h) { %>
+              <option value="<%= h.id %>" <%= String(filters.home_id) === String(h.id) ? 'selected' : '' %>><%= h.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label for="date_from">開始日</label>
+          <input type="date" name="date_from" id="date_from" value="<%= filters.date_from %>" />
+        </div>
+        <div>
+          <label for="date_to">終了日</label>
+          <input type="date" name="date_to" id="date_to" value="<%= filters.date_to %>" />
+        </div>
+        <div>
+          <button type="submit">絞り込む</button>
+        </div>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>ホーム</th>
+            <th>利用者名</th>
+            <th>報告者</th>
+            <th>夕食</th>
+            <th>宿泊</th>
+            <th>朝食</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% reports.forEach(function(r) { %>
+            <tr>
+              <td><%= r.report_date.toISOString().slice(0,10) %></td>
+              <td><%= r.home_name %></td>
+              <td><%= r.user_name %></td>
+              <td><%= r.reporter_name %></td>
+              <td class="<%= r.dinner ? 'mark-ok' : 'mark-ng' %>"><%= r.dinner ? '〇' : '×' %></td>
+              <td class="<%= r.lodging ? 'mark-ok' : 'mark-ng' %>"><%= r.lodging ? '〇' : '×' %></td>
+              <td class="<%= r.breakfast ? 'mark-ok' : 'mark-ng' %>"><%= r.breakfast ? '〇' : '×' %></td>
+            </tr>
+          <% }) %>
+          <% if (reports.length === 0) { %>
+            <tr><td colspan="7" class="muted">該当する報告がありません</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+      <p class="muted">最新500件まで表示しています。</p>
+    </div>
+  </div>
+</body>
+</html>
