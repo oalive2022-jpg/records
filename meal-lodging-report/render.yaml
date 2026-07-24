@@ -1,0 +1,24 @@
+databases:
+  - name: meal-lodging-report-db
+    databaseName: meal_lodging_report
+    plan: free
+
+services:
+  - type: web
+    name: meal-lodging-report
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    # デプロイの度にDBマイグレーション(テーブル作成)を実行してからサーバー起動
+    startCommand: node scripts/migrate.js && npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: meal-lodging-report-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
