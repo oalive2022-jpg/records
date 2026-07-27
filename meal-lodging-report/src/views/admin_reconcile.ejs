@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ポチパス照合 - <%= home.name %>｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .field-cell { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; }
+    .field-cell .label { color: var(--muted); font-size: 0.72rem; }
+    tr.issue-row { background: #fff8f0; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">ポチパス照合 - <%= home.name %></span>
+    <nav>
+      <a href="/admin/homes/<%= home.id %>/users">利用者一覧へ戻る</a>
+      <a href="/admin/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>ポチパスの実績記録票をアップロード</h1>
+      <p class="muted">
+        ポチパスから出力した「共同生活援助サービス提供実績記録票」(xlsx)を1人分アップロードすると、
+        このホームの利用者の中からファイル内の氏名に一致する人を自動で探し、このサイトの報告データと日ごとに突き合わせます。
+      </p>
+
+      <% if (error) { %>
+        <p class="error"><%= error %></p>
+      <% } %>
+
+      <form method="POST" action="/admin/homes/<%= home.id %>/reconcile" enctype="multipart/form-data">
+        <label for="pochipass_file">ポチパスの実績記録票（xlsx）</label>
+        <input type="file" name="pochipass_file" id="pochipass_file" accept=".xlsx" required />
+        <button type="submit">照合する</button>
+      </form>
+    </div>
+
+    <%- include('partials/reconcile_result', { result: result }) %>
+  </div>
+</body>
+</html>

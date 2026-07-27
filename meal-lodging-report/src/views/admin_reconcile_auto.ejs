@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>自動照合 - <%= user.name %>｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .field-cell { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; }
+    .field-cell .label { color: var(--muted); font-size: 0.72rem; }
+    tr.issue-row { background: #fff8f0; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">支援記録ノートと自動照合 - <%= user.name %></span>
+    <nav>
+      <a href="/admin/homes/<%= home.id %>/users">利用者一覧へ戻る</a>
+      <a href="/admin/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1><%= user.name %> さんの月を選んで照合</h1>
+      <p class="muted">支援記録ノートAPIから食事記録・宿泊記録を自動取得し、このサイトの報告データと突き合わせます。</p>
+      <form method="GET" action="/admin/homes/<%= home.id %>/users/<%= user.id %>/reconcile-auto" class="filter-bar">
+        <div>
+          <label for="month">対象月</label>
+          <input type="month" name="month" id="month" value="<%= month %>" required />
+        </div>
+        <div><button type="submit">照合する</button></div>
+      </form>
+
+      <% if (error) { %>
+        <p class="error"><%= error %></p>
+      <% } %>
+    </div>
+
+    <%- include('partials/reconcile_result', { result: result }) %>
+  </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<% if (result) { %>
+  <div class="card">
+    <h2><%= result.userName %> さん（<%= result.month %>）の照合結果</h2>
+
+    <% if (result.issueCount === 0) { %>
+      <p class="alert-banner alert-ok">✅ 差分・未入力はありませんでした（<%= result.rows.length %>日分を確認）</p>
+    <% } else { %>
+      <p class="alert-banner">⚠️ <%= result.issueCount %>日分で、不一致または未入力があります（背景がオレンジ色の行）</p>
+    <% } %>
+
+    <table>
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>夕食</th>
+          <th>宿泊</th>
+          <th>朝食</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% result.rows.forEach(function(row) { %>
+          <tr class="<%= row.hasIssue ? 'issue-row' : '' %>">
+            <td><%= row.date %>(<%= row.weekday %>)</td>
+            <% row.fields.forEach(function(f) { %>
+              <td>
+                <div class="field-cell">
+                  <% if (f.status === 'no_data') { %>
+                    <span class="muted">-</span>
+                  <% } else if (f.status === 'match') { %>
+                    <span class="<%= f.pochiVal ? 'mark-ok' : 'mark-ng' %>"><%= f.pochiVal ? '〇' : '×' %>（一致）</span>
+                  <% } else if (f.status === 'mismatch') { %>
+                    <span class="label">参照元: <%= f.pochiVal ? '〇' : '×' %> / サイト: <%= f.siteVal ? '〇' : '×' %></span>
+                    <span class="mark-ng">不一致</span>
+                  <% } else if (f.status === 'site_missing') { %>
+                    <span class="label">参照元: <%= f.pochiVal ? '〇' : '×' %></span>
+                    <span class="mark-ng">サイト未入力</span>
+                  <% } else if (f.status === 'pochi_missing') { %>
+                    <span class="label">サイト: <%= f.siteVal ? '〇' : '×' %></span>
+                    <span class="muted">参照元データなし</span>
+                  <% } %>
+                </div>
+              </td>
+            <% }) %>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

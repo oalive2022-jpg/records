@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>支援記録ノートと紐付け - <%= home.name %>｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">支援記録ノートと紐付け - <%= home.name %></span>
+    <nav>
+      <a href="/admin/homes/<%= home.id %>/users">利用者一覧へ戻る</a>
+      <a href="/admin/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <% if (error) { %>
+      <div class="card">
+        <p class="error"><%= error %></p>
+        <p class="muted">
+          Renderの環境変数に <code>SHIEN_API_BASE_URL</code>（例: https://shien-icfz.onrender.com）と
+          <code>SHIEN_API_KEY</code>（支援記録ノートの管理者メニュー「APIキー」から発行したキー）が
+          設定されているかご確認ください。
+        </p>
+      </div>
+    <% } %>
+
+    <div class="card">
+      <h1>① どのホームか選択</h1>
+      <p class="muted">支援記録ノート側に登録されているホームの中から、「<%= home.name %>」に対応するものを選んでください。</p>
+      <form method="POST" action="/admin/homes/<%= home.id %>/shien-link/select-home">
+        <label for="shien_home_id">支援記録ノート側のホーム</label>
+        <select name="shien_home_id" id="shien_home_id">
+          <option value="">-- 選択してください --</option>
+          <% shienHomes.forEach(function(h) { %>
+            <option value="<%= h.id %>" <%= home.shien_home_id === h.id ? 'selected' : '' %>><%= h.name %></option>
+          <% }) %>
+        </select>
+        <button type="submit">このホームを設定</button>
+      </form>
+    </div>
+
+    <% if (home.shien_home_id) { %>
+      <div class="card">
+        <h1>② 利用者ごとに紐付け</h1>
+        <p class="muted">このサイトの利用者名と、支援記録ノート側の利用者を1人ずつ対応付けてください。</p>
+        <form method="POST" action="/admin/homes/<%= home.id %>/shien-link">
+          <table>
+            <thead>
+              <tr>
+                <th>このサイトの利用者</th>
+                <th>支援記録ノート側の利用者</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% localUsers.forEach(function(u) { %>
+                <tr>
+                  <td><%= u.name %></td>
+                  <td>
+                    <select name="resident_id_<%= u.id %>">
+                      <option value="">-- 紐付けなし --</option>
+                      <% shienResidents.forEach(function(r) { %>
+                        <option value="<%= r.id %>" <%= u.shien_resident_id === r.id ? 'selected' : '' %>><%= r.name %></option>
+                      <% }) %>
+                    </select>
+                  </td>
+                </tr>
+              <% }) %>
+              <% if (localUsers.length === 0) { %>
+                <tr><td colspan="2" class="muted">このホームにはまだ利用者が登録されていません</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+          <button type="submit">紐付けを保存</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

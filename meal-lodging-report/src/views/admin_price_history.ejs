@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= user.name %>の単価改定履歴｜食事宿泊報告ツール</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <span class="title">単価改定履歴 - <%= user.name %></span>
+    <nav>
+      <a href="/admin/homes/<%= homeId %>/users">利用者一覧へ戻る</a>
+      <a href="/admin/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>単価を改定する</h1>
+      <p class="muted">
+        「適用開始日」以降の報告分から、新しい単価で計算されます。過去分（適用開始日より前の報告）は、その時点で有効だった単価のまま変わりません。<br />
+        既に登録済みの適用開始日を指定すると、その日の単価を上書き修正できます。
+      </p>
+      <form method="POST" action="/admin/homes/<%= homeId %>/users/<%= user.id %>/price-history">
+        <div class="filter-bar">
+          <div>
+            <label for="effective_from">適用開始日</label>
+            <input type="date" name="effective_from" id="effective_from" required />
+          </div>
+          <div>
+            <label for="breakfast_price">朝食単価（円）</label>
+            <input type="number" name="breakfast_price" id="breakfast_price" min="0" step="1" value="0" required />
+          </div>
+          <div>
+            <label for="dinner_price">夕食単価（円）</label>
+            <input type="number" name="dinner_price" id="dinner_price" min="0" step="1" value="0" required />
+          </div>
+          <div>
+            <button type="submit">この内容で登録</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>改定履歴（新しい順）</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>適用開始日</th>
+            <th>朝食単価</th>
+            <th>夕食単価</th>
+            <th>登録日時</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% history.forEach(function(h) { %>
+            <tr>
+              <td><%= h.effective_from.toISOString().slice(0,10) %></td>
+              <td>¥<%= Number(h.breakfast_price).toLocaleString() %></td>
+              <td>¥<%= Number(h.dinner_price).toLocaleString() %></td>
+              <td class="muted"><%= h.created_at.toISOString().slice(0,16).replace('T',' ') %></td>
+              <td>
+                <form class="inline" method="POST" action="/admin/homes/<%= homeId %>/users/<%= user.id %>/price-history/<%= h.id %>/delete" onsubmit="return confirm('この単価改定履歴を削除しますか？');">
+                  <button type="submit" class="danger" style="margin-top:0; padding:4px 10px; font-size:0.85rem;">削除</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (history.length === 0) { %>
+            <tr><td colspan="5" class="muted">履歴がありません</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
